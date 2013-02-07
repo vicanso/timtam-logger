@@ -19,19 +19,12 @@ class Logger
 
 
 do () ->
-  Logger.prototype.loggers =
-    default : log4js.getLogger 'default'
+  Logger.prototype.loggers = {}
   _.each 'log info error warn debug trace'.split(' '), (func) ->
     Logger.prototype.loggers[func] = log4js.getLogger "[#{func.toUpperCase()}-LOGGER]"
     Logger.prototype.loggers[func].setLevel func
     Logger.prototype[func] = (args...) ->
-      logger = @loggers[func] || @loggers['default']
-      if func == 'error'
-        err = new Error
-        info = err.stack.split('\n')[2]
-        args.unshift info.trim()
-      args.unshift @msgPrefix
+      logger = @logger || @loggers[func]
       logger[func].apply logger, args
-
 
 module.exports = Logger
