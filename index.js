@@ -73,7 +73,7 @@
     */
 
     getConnectLogger: function(msgPrefix, options) {
-      return log4js.connectLogger(this.getLogger(msgPrefix, 'CONNECT-LOGGER'), options);
+      return log4js.connectLogger(this.getLogger('', msgPrefix), options);
     }
   };
 

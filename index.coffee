@@ -47,4 +47,4 @@ module.exports =
    * @return {Function}           [description]
   ###
   getConnectLogger : (msgPrefix, options) ->
-    return log4js.connectLogger @getLogger(msgPrefix, 'CONNECT-LOGGER'), options
+    return log4js.connectLogger @getLogger('', msgPrefix), options

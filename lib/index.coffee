@@ -8,7 +8,7 @@ _ = require 'underscore'
 
 
 class Logger
-  constructor : (@msgPrefix, category) ->
+  constructor : (msgPrefix, category) ->
     if msgPrefix
       if _.isArray msgPrefix
         @msgPrefix = "[#{msgPrefix.join(', ')}]"
@@ -25,6 +25,13 @@ do () ->
     Logger.prototype.loggers[func].setLevel func
     Logger.prototype[func] = (args...) ->
       logger = @logger || @loggers[func]
+      if @msgPrefix
+        args.unshift @msgPrefix
       logger[func].apply logger, args
+  _.each 'addListener emit fatal isDebugEnabled isErrorEnabled isFatalEnabled isInfoEnabled isLevelEnabled isTraceEnabled isWarnEnabled listeners on once removeAllListeners removeLevel removeListener setLevel setMaxListeners'.split(' '), (func) ->
+    Logger.prototype[func] = (args...) ->
+      logger = @logger
+      if logger
+        logger[func].apply logger, args
 
 module.exports = Logger
