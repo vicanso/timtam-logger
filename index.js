@@ -1,6 +1,6 @@
 
 /**!
-* Copyright(c) 2013 vicanso 腻味
+* Copyright(c) 2013 vicanso 墨鱼仔
 * MIT Licensed
 */
 
