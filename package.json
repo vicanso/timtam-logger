@@ -1,0 +1,27 @@
+{
+  "name": "jtlogger",
+  "description": "node logger",
+  "version": "0.0.1",
+  "author": {
+    "name": "vicanso 小墨鱼",
+    "email": "vicansocanbico@gmail.com"
+  },
+  "keywords": [
+    "log logger"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vicanso/jtlogger.git"
+  },
+  "main": "lib/logger",
+  "readmeFilename": "README.md",
+  "devDependencies": {
+    "gulp": "^3.8.10",
+    "gulp-jshint": "^1.9.0"
+  },
+  "dependencies": {
+    "colors": "^1.0.3",
+    "moment": "^2.8.3",
+    "traceback": "^0.3.1"
+}
