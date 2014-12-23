@@ -1,5 +1,7 @@
 var gulp = require('gulp');
 var jshint = require('gulp-jshint');
+var mocha = require('gulp-mocha');
+var cover = require('gulp-coverage');
 
 gulp.task('jshint', function() {
   return gulp.src('./lib/*.js')
@@ -21,4 +23,4 @@ gulp.task('test', function(){
     }));
 });
 
-gulp.task('default', ['jshint']);
+gulp.task('default', ['jshint', 'test']);
