@@ -17,7 +17,7 @@
   "main": "lib/logger",
   "readmeFilename": "README.md",
   "scripts" : {
-    "test" : "node node_modules/gulp/bin/gulp.js"
+    "test" : "gulp test"
   },
   "devDependencies": {
     "gulp": "^3.8.10",
