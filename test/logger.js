@@ -11,7 +11,7 @@ describe('#logger', function(){
   it('should log msg successful', function(done){
     setTimeout(function(){
       console.log('test');
-    }, 100);
+    }, 0);
     var stream = {
       write : function(msg){
         assert.equal(msg.substring(0, msg.length - 24), '[L][test/logger:13] test');
