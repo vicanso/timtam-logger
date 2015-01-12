@@ -1,6 +1,7 @@
 "use strict";
 var logger = require('../lib/logger');
 logger.appPath = '/Users/tree/快盘/github/jtlogger/';
+logger.logPrefix = '[aofjeoajfe]';
 
 
 setInterval(function(){

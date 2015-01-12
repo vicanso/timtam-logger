@@ -14,7 +14,7 @@ describe('#logger', function(){
     }, 100);
     var stream = {
       write : function(msg){
-        assert.equal(msg.substring(0, msg.length - 25), '[L][test/logger:13] test');
+        assert.equal(msg.substring(0, msg.length - 24), '[L][test/logger:13] test');
         done();
       }
     };
