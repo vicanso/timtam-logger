@@ -4,8 +4,8 @@ var assert = require('assert');
 var path = require('path');
 var logger = require('../lib/logger');
 logger.appPath = path.join(__dirname, '..') + '/';
-logger.filter = function(file){
-  return file.indexOf('node_modules') === -1;
+logger.reject = function(file){
+  return file.indexOf('node_modules') !== -1;
 };
 describe('#logger', function(){
   it('should log msg successful', function(done){
@@ -18,6 +18,6 @@ describe('#logger', function(){
         done();
       }
     };
-    logger.stream = stream;
+    logger.add(logger.transports.Stream, stream);
   });
 });
