@@ -20,5 +20,8 @@
     "test": "gulp test"
   },
   "devDependencies": {},
-  "dependencies": {}
+  "dependencies": {
+    "mkdirp": "^0.5.1",
+    "winston": "^1.0.1"
+  }
 }
