@@ -6,6 +6,9 @@ class Console extends Transport {
 	constructor(options) {
 		super(options);
 	}
+	get name() {
+		return 'console';
+	}
 	write(data) {
 		debug('console write:%j', data);
 		let level = data.level;

@@ -10,6 +10,9 @@ class Transport {
 	close() {
 		// 继承的transport各自实现
 	}
+	get name() {
+		return 'base';
+	}
 	log(level, msg) {
 		let options = this.options;
 		let data = {

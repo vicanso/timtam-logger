@@ -8,6 +8,9 @@ class UDP extends Transport {
 		this.client = dgram.createSocket('udp4');
 		this.doingCount = 0;
 	}
+	get name() {
+		return 'udp';
+	}
 	write(data) {
 		debug('udp write:%j', data);
 		let options = this.options;

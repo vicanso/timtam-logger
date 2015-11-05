@@ -5,9 +5,18 @@ const debug = require('debug')('jt.timtam-logger');
 const _ = require('lodash');
 class TCP extends Transport {
 	constructor(options) {
+		options = _.extend({
+			// 当连接中断，buffer的数据量最大值
+			max: 500
+		}, options);
 		super(options);
 		this.connect();
 		this.buffers = [];
+		this.endBuf = new Buffer(1);
+		this.endBuf[0] = 0;
+	}
+	get name() {
+		return 'tcp';
 	}
 	connect() {
 		let options = this.options;
@@ -17,9 +26,8 @@ class TCP extends Transport {
 		let reconnect = _.debounce(function() {
 			this.client.end();
 			this.connect();
-			// console.info('timtam tcp transport reconnect');
+			console.info('timtam tcp transport reconnect');
 		}.bind(this), 2000);
-
 		client.on('end', reconnect);
 		client.on('error', reconnect);
 		this.client = client;
@@ -31,18 +39,25 @@ class TCP extends Transport {
 			app: options.app,
 			log: data
 		}));
+		buf = Buffer.concat([buf, this.endBuf]);
 		let client = this.client;
+
 		if (client.writable) {
 			client.write(buf);
 		} else {
-			this.buffers.push(buf);
+			let buffers = this.buffers;
+			buffers.push(buf);
+			if (buffers.length > options.max) {
+				buffers.shift();
+			}
 		}
 	}
 	flush() {
-		this.buffers.forEach(function(buf) {
+		let buffers = this.buffers;
+		buffers.forEach(function(buf) {
 			this.client.write(buf);
 		}.bind(this));
-		this.buffers.length = 0;
+		buffers.length = 0;
 	}
 }
 
