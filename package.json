@@ -9,6 +9,7 @@
 	"keywords": [
 		"log logger"
 	],
+	"main": "./lib/logger",
 	"license": "MIT",
 	"repository": {
 		"type": "git",
