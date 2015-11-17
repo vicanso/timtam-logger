@@ -13,7 +13,7 @@
 	"license": "MIT",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/vicanso/jtlogger.git"
+		"url": "https://github.com/vicanso/timtam-logger.git"
 	},
 	"readmeFilename": "README.md",
 	"scripts": {
@@ -21,14 +21,12 @@
 	},
 	"devDependencies": {
 		"gulp": "^3.9.0",
-		"gulp-istanbul": "^0.10.0",
-		"gulp-jshint": "^1.11.2",
-		"gulp-mocha": "^2.1.3"
+		"gulp-istanbul": "^0.10.2",
+		"gulp-jshint": "^1.12.0",
+		"gulp-mocha": "^2.2.0"
 	},
 	"dependencies": {
 		"debug": "^2.2.0",
-		"lodash": "^3.10.1",
-		"mkdirp": "^0.5.1",
-		"winston": "^1.0.1"
+		"lodash": "^3.10.1"
 	}
 }
