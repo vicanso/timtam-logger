@@ -1,4 +1,5 @@
 'use strict';
+const _ = require('lodash');
 
 class Transport {
 	constructor(options) {
@@ -15,10 +16,10 @@ class Transport {
 	}
 	log(level, msg) {
 		let options = this.options;
-		let data = {
+		let data = _.extend({
 			message: msg,
 			level: level
-		};
+		}, options.extra);
 		if (options.timestamp) {
 			data.date = (new Date()).toISOString();
 		}
