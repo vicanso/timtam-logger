@@ -13,6 +13,9 @@ class File extends Transport {
 	get name() {
 		return 'file';
 	}
+	close(cb) {
+		this.stream.end(cb);
+	}
 	write(data) {
 		debug('file write:%j', data);
 		let options = this.options;

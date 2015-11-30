@@ -5,24 +5,24 @@ const debug = require('debug')('jt.timtam-logger');
 const _ = require('lodash');
 class TCP extends Transport {
 	constructor(options) {
-		options = _.extend({
-			// 当连接中断，buffer的数据量最大值
-			max: 500
-		}, options);
+		options = _.extend({}, options);
 		super(options);
 		this.connect();
-		this.buffers = [];
 		this.endBuf = new Buffer(1);
 		this.endBuf[0] = 0;
 	}
 	get name() {
 		return 'tcp';
 	}
+	close() {
+		this.client.end();
+	}
 	connect() {
 		let options = this.options;
 		let port = options.port || 6000;
 		let host = options.host || '127.0.0.1';
-		let client = net.createConnection(port, host, this.flush.bind(this));
+		let client = net.createConnection(port, host);
+		/* istanbul ignore next */
 		let reconnect = _.debounce(function() {
 			this.client.end();
 			this.connect();
@@ -40,24 +40,7 @@ class TCP extends Transport {
 			log: data
 		}));
 		buf = Buffer.concat([buf, this.endBuf]);
-		let client = this.client;
-
-		if (client.writable) {
-			client.write(buf);
-		} else {
-			let buffers = this.buffers;
-			buffers.push(buf);
-			if (buffers.length > options.max) {
-				buffers.shift();
-			}
-		}
-	}
-	flush() {
-		let buffers = this.buffers;
-		buffers.forEach(function(buf) {
-			this.client.write(buf);
-		}.bind(this));
-		buffers.length = 0;
+		this.client.write(buf);
 	}
 }
 

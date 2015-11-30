@@ -12,10 +12,11 @@ class Transport {
 		// 继承的transport各自实现
 	}
 	get name() {
+		/* istanbul ignore next */
 		return 'base';
 	}
 	log(level, msg) {
-		let options = this.options;
+		let options = this.options || {};
 		let data = _.extend({
 			message: msg,
 			level: level

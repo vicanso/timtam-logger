@@ -15,5 +15,24 @@ gulp.task('jshint', function() {
 });
 
 
+gulp.task('test', function(cb) {
+	gulp.src(['./transports/*.js'])
+		.pipe(istanbul())
+		.pipe(istanbul.hookRequire())
+		.on('finish', function() {
+			gulp.src(['./test/*.js'])
+				.pipe(mocha({
+					reporter: 'spec'
+				}))
+				.pipe(istanbul.writeReports({
+					reporters: ['text', 'text-summary', 'html']
+				}))
+				.pipe(istanbul.enforceThresholds({
+					thresholds: {
+						global: 90
+					}
+				})).on('end', cb);
+		});
+});
 
-gulp.task('default', ['jshint']);
+gulp.task('default', ['jshint', 'test']);
