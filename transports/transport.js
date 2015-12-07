@@ -17,10 +17,10 @@ class Transport {
 	}
 	log(level, msg) {
 		let options = this.options || {};
-		let data = _.extend({
+		let data = _.extend({}, options.extra, {
 			message: msg,
 			level: level
-		}, options.extra);
+		});
 		if (options.timestamp) {
 			data.date = (new Date()).toISOString();
 		}

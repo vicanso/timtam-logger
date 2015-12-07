@@ -8,7 +8,7 @@ logger.init({
 
 // logger.add('console');
 logger.add('udp', {
-	port: 6000,
+	port: 7001,
 	host: '127.0.0.1'
 });
 
