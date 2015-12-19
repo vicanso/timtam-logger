@@ -2,14 +2,11 @@
 const _ = require('lodash');
 const logger = require('..');
 
-logger.init({
-	app: 'test'
-});
+logger.wrap(console);
 
-// logger.add('console');
 logger.add('udp', {
 	port: 7001,
-	host: '127.0.0.1'
+	host: 'black'
 });
 
 let messages = [
@@ -27,8 +24,7 @@ function send() {
 		let type = types[index];
 		console[type](messages[index]);
 		send();
-		console.dir(++total);
-	}, (index + 1) * 10);
+	}, (index + 1) * 1000);
 }
 
 send();

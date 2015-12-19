@@ -1,32 +1,52 @@
-"use strict";
+'use strict';
 const assert = require('assert');
+const util = require('util');
 const Console = require('../transports/console');
 
 
-describe('Console', function() {
-	let c = new Console();
-	it('should log message successful', function(done) {
-		assert.equal(c.name, 'console');
-		c.stdout = {
-			write: function(msg) {
-				let index = msg.indexOf('info: info message');
-				assert(index !== -1);
-				c.stdout = process.stdout;
-				done();
-			}
-		};
-		c.log('info', 'info message');
+describe('transport-console', () => {
+	it('should new Console success', () => {
+		const transport = new Console();
+		assert(transport.options);
+		assert.equal(transport.name, 'console');
+		assert(util.isFunction(transport.log));
+		assert(util.isFunction(transport.write));
+		assert(transport.stdout, process.stdout);
+		assert(transport.stderr, process.stderr);
 	});
 
-	it('should log error message successful', function(done) {
-		c.stderr = {
-			write: function(msg) {
-				let index = msg.indexOf('error: Error: my error');
-				assert(index !== -1);
-				c.stderr = process.stderr;
+	it('should console log success', done => {
+		const transport = new Console();
+		let msgList = ['[info] Hello World!', '[error] Hello World!']
+		const writeObj = {
+			write: (msg) => {
+				assert.equal(msg, msgList.shift());
+				if (!msgList.length) {
+					done();
+				}
+			}
+		};
+		transport.stdout = writeObj;
+		transport.stderr = writeObj;
+
+		transport.log('info', 'Hello World!');
+		transport.log('error', 'Hello World!');
+	});
+
+
+	it('should console json log success', done => {
+		const transport = new Console({
+			format: 'json',
+			extra: {
+				pid: 123
+			}
+		});
+		transport.stdout = {
+			write: (msg) => {
+				assert.equal(msg, '{"level":"info","msg":"Hello World!","pid":123}');
 				done();
 			}
 		};
-		c.log('error', new Error('my error'));
+		transport.log('info', 'Hello World!');
 	});
 });

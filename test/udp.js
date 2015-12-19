@@ -1,27 +1,38 @@
-"use strict";
+'use strict';
 const assert = require('assert');
+const util = require('util');
 const UDP = require('../transports/udp');
+const dgram = require('dgram');
 
 
-
-describe('UDP', function() {
-	it('should log message successful', function(done) {
-		const port = 6000;
-		const net = require('net');
-		const server = require('dgram').createSocket('udp4');
-		server.bind(port);
-		server.on('message', function(buf) {
-			let data = JSON.parse(buf);
-			assert.equal(data.log.level, 'info');
-			assert.equal(data.log.message, 'my info');
-			server.close(done);
-		});
-		let udp = new UDP({
-			port: port
-		});
-		assert.equal(udp.name, 'udp');
-		udp.log('info', 'my info');
-		udp.close();
+describe('transport-udp', () => {
+	it('should new UDP success', () => {
+		const transport = new UDP();
+		assert(transport.options);
+		assert.equal(transport.name, 'udp');
+		assert(util.isFunction(transport.log));
+		assert(util.isFunction(transport.write));
 	});
 
+	it('should send log success by udp', done => {
+
+		const server = dgram.createSocket('udp4');
+		server.on('listening', () => {
+			const address = server.address();
+			const transport = new UDP({
+				app: 'timtam-logger',
+				port: address.port
+			});
+
+			transport.log('info', 'Hello World!');
+		});
+
+		server.on('message', (buf) => {
+			assert.equal(buf.toString(), 'timtam-logger\t[info] Hello World!');
+			server.close(done);
+		});
+		server.bind();
+
+
+	});
 });

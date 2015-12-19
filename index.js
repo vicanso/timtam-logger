@@ -1,30 +1,25 @@
 'use strict';
 const util = require('util');
-const debug = require('debug')('jt.timtam-logger');
 const _ = require('lodash');
-const Console = require('../transports/console');
-const UDP = require('../transports/udp');
-const TCP = require('../transports/tcp');
-const File = require('../transports/file');
-const transports = [];
+const Console = require('./transports/console');
+const UDP = require('./transports/udp');
 const defaultOptions = {
 	app: 'timtam',
 	timestamp: true,
 	// 日志最大长度
-	maxLength: 1000
+	maxLength: 900
 };
+const defaultFns = 'log info warn error'.split(' ');
+const transports = [];
 
-exports.transports = {
-	udp: UDP,
-	tcp: TCP,
-	console: Console,
-	file: File
-};
 
-exports.defaultOptions = defaultOptions;
-
-exports.init = _.once(init);
+exports.wrap = wrap;
 exports.add = add;
+exports.remove = remove;
+exports.set = set;
+
+init();
+
 
 
 function log(type, str) {
@@ -33,16 +28,16 @@ function log(type, str) {
 	});
 }
 
-/**
- * [init description]
- * @return {[type]} [description]
- */
-function init(options) {
-	_.assign(defaultOptions, options);
-	let maxLength = defaultOptions.maxLength;
-	let fns = 'log info warn error'.split(' ');
-	fns.forEach(function(fn) {
-		console[fn] = function() {
+function init() {
+	wrap(exports);
+}
+
+
+function wrap(obj, fns) {
+	fns = fns || defaultFns;
+	_.forEach(fns, fn => {
+		obj[fn] = function() {
+			const maxLength = defaultOptions.maxLength;
 			let args = Array.from(arguments);
 			if (fn === 'error') {
 				args = args.map(function(argument) {
@@ -64,6 +59,13 @@ function init(options) {
 	});
 }
 
+function set(k, v) {
+	if (_.isObject(k)) {
+		_.extend(defaultOptions, k);
+	} else {
+		defaultOptions[k] = v;
+	}
+}
 
 /**
  * [add description]
@@ -73,18 +75,10 @@ function init(options) {
 function add(type, options) {
 	options = _.extend({}, options, defaultOptions);
 	let transport;
-	switch (type) {
-		case 'udp':
-			transport = new UDP(options);
-			break;
-		case 'tcp':
-			transport = new TCP(options);
-			break;
-		case 'file':
-			transport = new File(options);
-			break;
-		default:
-			transport = new Console(options);
+	if (type === 'udp') {
+		transport = new UDP(options);
+	} else {
+		transport = new Console(options);
 	}
 	transports.push(transport);
 	return transport;
@@ -98,6 +92,7 @@ function add(type, options) {
  */
 function remove(transport) {
 	let index = transports.indexOf(transport);
+	/* istanbul ignore else */
 	if (index !== -1) {
 		transports.splice(index, 1);
 	}
