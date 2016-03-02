@@ -4,6 +4,8 @@ const logger = require('..');
 
 logger.wrap(console);
 
+logger.set('app', 'koa');
+
 logger.add('udp', {
 	port: 7001,
 	host: '127.0.0.1'
