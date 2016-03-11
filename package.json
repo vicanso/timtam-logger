@@ -1,14 +1,11 @@
 {
 	"name": "timtam-logger",
 	"description": "logger for node.js",
-	"version": "0.3.1",
-	"author": {
-		"name": "vicanso 小墨鱼",
-		"email": "vicansocanbico@gmail.com"
-	},
+	"version": "0.3.2",
+	"author": "Tree Xie <vicansocanbico@gmail.com>",
 	"keywords": [
-		"logger",
 		"log",
+		"logger",
 		"udp"
 	],
 	"license": "MIT",
@@ -18,16 +15,19 @@
 	},
 	"readmeFilename": "README.md",
 	"scripts": {
-		"pretest": "npm install",
-		"test": "node ./node_modules/.bin/eslint ./index.js ./transports/*.js && node ./node_modules/.bin/istanbul cover ./node_modules/.bin/_mocha --report lcovonly --"
+		"test": "node ./node_modules/.bin/eslint ./index.js ./transports/*.js&& node ./node_modules/.bin/istanbul cover ./node_modules/.bin/_mocha ./test/*.js --"
 	},
 	"devDependencies": {
-		"eslint": "^2.2.0",
+		"eslint": "^2.3.0",
 		"istanbul": "^0.4.2",
 		"mocha": "^2.4.5"
 	},
 	"dependencies": {
 		"debug": "^2.2.0",
-		"lodash": "^4.6.0"
-	}
+		"lodash": "^4.6.1"
+	},
+  "bugs": {
+    "url": "https://github.com/vicanso/timtam-logger/issues"
+  },
+  "homepage": "https://github.com/vicanso/timtam-logger"
 }

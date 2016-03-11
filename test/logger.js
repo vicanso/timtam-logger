@@ -50,11 +50,12 @@ describe('logger', () => {
 
 
 	it('should send log by udp success', done => {
-		logger.set('app', 'timtam-test')
+		logger.set('app', 'timtam-test');
 		const server = dgram.createSocket('udp4');
+		let transport;
 		server.on('listening', () => {
 			const address = server.address();
-			const transport = logger.add('udp', {
+			transport = logger.add('udp', {
 				port: address.port
 			});
 
@@ -65,6 +66,31 @@ describe('logger', () => {
 			const str = buf.toString();
 			assert.equal(str.indexOf('[info] Hello World!'), 37);
 			assert(str.indexOf('timtam-test') !== -1);
+			logger.remove(transport);
+			server.close(done);
+		});
+		server.bind();
+	});
+
+
+	it('should init udp transport by uri success', done => {
+		logger.set({
+			'app': 'timtam-app'
+		});
+		const server = dgram.createSocket('udp4');
+		let transport;
+		server.on('listening', () => {
+			const address = server.address();
+			transport = logger.add(`udp://127.0.0.1:${address.port}`);
+
+			transport.log('info', 'Hello World!');
+		});
+
+		server.on('message', (buf) => {
+			const str = buf.toString();
+			assert.equal(str.indexOf('[info] Hello World!'), 36);
+			assert(str.indexOf('timtam-app') !== -1);
+			logger.remove(transport);
 			server.close(done);
 		});
 		server.bind();

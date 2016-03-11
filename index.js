@@ -74,6 +74,13 @@ function set(k, v) {
  */
 function add(type, options) {
 	options = _.extend({}, options, defaultOptions);
+	const reg = /(\S+?)\:\/\/(\S+)\:(\S+)/;
+	const result = reg.exec(type);
+	if (result && result[1] && result[2] && result[3]) {
+		type = result[1];
+		options.host = result[2];
+		options.port = parseInt(result[3]);
+	}
 	let transport;
 	if (type === 'udp') {
 		transport = new UDP(options);
