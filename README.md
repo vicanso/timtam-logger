@@ -21,7 +21,7 @@ const logger = require('timtam-logger');
 logger.set('app', 'timtam-test');
 
 logger.set({
-	app: 'timtam-test'
+  app: 'timtam-test'
 });
 
 ```
@@ -55,8 +55,8 @@ add udp transport
 const logger = require('timtam-logger');
 // logger.add(transportType, options);
 logger.add('udp', {
-	port: 6000,
-	host: '127.0.0.1'
+  port: 6000,
+  host: '127.0.0.1'
 });
 logger.add('udp://127.0.0.1:6000');
 ```
@@ -78,11 +78,11 @@ remove transport
 ```js
 const logger = require('timtam-logger');
 const udpTransport = logger.add('udp', {
-	port: 6000,
-	host: '127.0.0.1'
+  port: 6000,
+  host: '127.0.0.1'
 });
 setTimeout(function(){
-	logger.remove(udpTransport);
+  logger.remove(udpTransport);
 }, 10 * 1000);
 ```
 
