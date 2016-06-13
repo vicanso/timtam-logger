@@ -1,3 +1,4 @@
+'use strict';
 const util = require('util');
 const _ = require('lodash');
 const Console = require('./transports/console');

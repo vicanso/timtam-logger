@@ -1,3 +1,4 @@
+'use strict';
 const Transport = require('./transport');
 const debug = require('debug')('jt.timtam-logger');
 const _ = require('lodash');

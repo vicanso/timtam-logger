@@ -1,3 +1,4 @@
+'use strict';
 const debug = require('debug')('jt.timtam-logger');
 const _ = require('lodash');
 const map = new WeakMap();
