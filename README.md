@@ -1,5 +1,9 @@
 # timtam logger
 
+[![Build Status](https://travis-ci.org/vicanso/timtam-logger.svg?branch=master)](https://travis-ci.org/vicanso/timtam-logger)
+[![Coverage Status](https://img.shields.io/coveralls/vicanso/timtam-logger/master.svg?style=flat)](https://coveralls.io/r/vicanso/timtam-logger?branch=master)
+[![npm](http://img.shields.io/npm/v/timtam-logger.svg?style=flat-square)](https://www.npmjs.org/package/timtam-logger)
+[![Github Releases](https://img.shields.io/npm/dm/timtam-logger.svg?style=flat-square)](https://github.com/vicanso/timtam-logger)
 
 ## Installation
 
