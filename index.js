@@ -1,8 +1,11 @@
 'use strict';
+
 const util = require('util');
 const _ = require('lodash');
+
 const Console = require('./transports/console');
 const UDP = require('./transports/udp');
+
 const defaultOptions = {
   app: 'timtam',
   timestamp: true,
@@ -18,20 +21,21 @@ function log(type, str) {
 
 function wrap(obj, _fns) {
   const fns = _fns || defaultFns;
-  _.forEach(fns, fn => {
+  _.forEach(fns, (fn) => {
     /* eslint no-param-reassign:0 */
     obj[fn] = function wrapFn() {
       /* eslint prefer-rest-params:0 */
       let args = Array.from(arguments);
       const maxLength = defaultOptions.maxLength;
       if (fn === 'error') {
-        args = args.map(argument => {
+        args = args.map((argument) => {
           if (util.isError(argument)) {
             return `Error:${argument.message}, stack:${argument.stack}`;
           }
           return argument;
         });
       }
+      /* eslint prefer-spread:0 */
       let str = util.format.apply(util, args);
       if (str.length > maxLength) {
         str = `${str.substring(0, maxLength)}...`;

@@ -1,7 +1,7 @@
 {
   "name": "timtam-logger",
   "description": "logger for node.js",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "author": "Tree Xie <vicansocanbico@gmail.com>",
   "keywords": [
     "log",
@@ -15,23 +15,24 @@
   },
   "readmeFilename": "README.md",
   "scripts": {
+    "size": "t=\"$(npm pack .)\"; wc -c \"${t}\"; tar tvf \"${t}\"; rm \"${t}\";",
     "test": "node ./node_modules/.bin/eslint ./index.js ./transports/*.js&& node ./node_modules/.bin/istanbul cover ./node_modules/.bin/_mocha ./test/*.js --"
   },
   "engines": {
     "node": ">=4.0.0"
   },
   "devDependencies": {
-    "eslint": "^2.12.0",
-    "eslint-config-airbnb": "^9.0.1",
-    "eslint-plugin-import": "^1.8.1",
-    "eslint-plugin-jsx-a11y": "^1.4.2",
-    "eslint-plugin-react": "^5.1.1",
-    "istanbul": "^0.4.2",
-    "mocha": "^2.4.5"
+    "eslint": "^3.12.2",
+    "eslint-config-airbnb": "^13.0.0",
+    "eslint-plugin-import": "^2.2.0",
+    "eslint-plugin-jsx-a11y": "^2.2.3",
+    "eslint-plugin-react": "^6.8.0",
+    "istanbul": "^0.4.5",
+    "mocha": "^3.1.0"
   },
   "dependencies": {
-    "debug": "^2.2.0",
-    "lodash": "^4.13.1"
+    "debug": "^2.6.1",
+    "lodash": "^4.17.4"
   },
   "bugs": {
     "url": "https://github.com/vicanso/timtam-logger/issues"

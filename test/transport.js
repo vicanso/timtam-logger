@@ -14,18 +14,18 @@ describe('transport', () => {
     const transport = new Transport({
       extra: {
         pid: 123,
-        id: 'vicanso'
-      }
+        id: 'vicanso',
+      },
     });
     assert.equal(transport.options.extra, 'pid=123,id=vicanso');
   });
 
-  it('should write text log success', done => {
+  it('should write text log success', (done) => {
     const transport = new Transport({
       extra: {
-        pid: 123
+        pid: 123,
       },
-      timestamp: true
+      timestamp: true,
     });
 
     transport.write = (data) => {
@@ -38,13 +38,13 @@ describe('transport', () => {
   });
 
 
-  it('should write json log with date success', done => {
+  it('should write json log with date success', (done) => {
     const transport = new Transport({
       extra: {
-        pid: 123
+        pid: 123,
       },
       format: 'json',
-      timestamp: true
+      timestamp: true,
     });
 
     transport.write = (data) => {
@@ -56,5 +56,15 @@ describe('transport', () => {
     };
 
     transport.log('info', 'Hello World!');
-  })
+  });
+
+  it('should set prefix for log success', (done) => {
+    const transport = new Transport();
+    transport.prefix = 'ABCD';
+    transport.write = (data) => {
+      assert.equal('[info] ABCD Hello World!', data);
+      done();
+    };
+    transport.log('info', 'Hello World!');
+  });
 });

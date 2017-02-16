@@ -1,8 +1,11 @@
 'use strict';
-const Transport = require('./transport');
-const debug = require('debug')('jt.timtam-logger');
+
+const debug = require('debug')('timtam-logger');
 const _ = require('lodash');
 const dgram = require('dgram');
+
+const Transport = require('./transport');
+
 class UDP extends Transport {
   constructor(opts) {
     const options = _.extend({}, {
@@ -19,6 +22,7 @@ class UDP extends Transport {
     this._client = dgram.createSocket('udp4');
     debug('options:%j', options);
   }
+  /* eslint class-methods-use-this:0 */
   get name() {
     return 'udp';
   }

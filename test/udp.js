@@ -14,16 +14,14 @@ describe('transport-udp', () => {
     assert(util.isFunction(transport.write));
   });
 
-  it('should send log success by udp', done => {
-
+  it('should send log success by udp', (done) => {
     const server = dgram.createSocket('udp4');
     server.on('listening', () => {
       const address = server.address();
       const transport = new UDP({
         app: 'timtam-logger',
-        port: address.port
+        port: address.port,
       });
-
       transport.log('info', 'Hello World!');
     });
 
@@ -32,7 +30,5 @@ describe('transport-udp', () => {
       server.close(done);
     });
     server.bind();
-
-
   });
 });

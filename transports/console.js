@@ -1,6 +1,7 @@
 'use strict';
+
 const Transport = require('./transport');
-const debug = require('debug')('jt.timtam-logger');
+const debug = require('debug')('timtam-logger');
 
 class Console extends Transport {
   constructor(options) {
@@ -9,6 +10,7 @@ class Console extends Transport {
     this.originalStdout = process.stdout;
     this.originalStderr = process.stderr;
   }
+  /* eslint class-methods-use-this:0 */
   get name() {
     return 'console';
   }
