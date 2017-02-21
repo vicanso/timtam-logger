@@ -58,6 +58,7 @@ logger.add('udp', {
   port: 6000,
   host: '127.0.0.1'
 });
+// or use uri
 logger.add('udp://127.0.0.1:6000');
 ```
 

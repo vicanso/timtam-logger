@@ -61,8 +61,20 @@ describe('transport', () => {
   it('should set prefix for log success', (done) => {
     const transport = new Transport();
     transport.prefix = 'ABCD';
+    assert.equal(transport.prefix, 'ABCD');
     transport.write = (data) => {
       assert.equal('[info] ABCD Hello World!', data);
+      done();
+    };
+    transport.log('info', 'Hello World!');
+  });
+
+  it('should set suffix for log success', (done) => {
+    const transport = new Transport();
+    transport.suffix = 'ABCD';
+    assert.equal(transport.suffix, 'ABCD');
+    transport.write = (data) => {
+      assert.equal('[info] Hello World! ABCD', data);
       done();
     };
     transport.log('info', 'Hello World!');

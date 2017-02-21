@@ -29,6 +29,12 @@ class Transport {
   get prefix() {
     return this.options.prefix;
   }
+  set suffix(v) {
+    map.get(this).suffix = v;
+  }
+  get suffix() {
+    return this.options.suffix;
+  }
   log(level, msg) {
     const options = this.options;
     const now = (new Date()).toISOString();
@@ -48,6 +54,9 @@ class Transport {
       if (options.timestamp) {
         arr.unshift(now);
       }
+      if (options.suffix) {
+        arr.push(options.suffix);
+      }
       data = arr.join(' ');
     } else {
       data = _.extend({
@@ -56,6 +65,9 @@ class Transport {
       }, options.extra);
       if (options.prefix) {
         data.prefix = options.prefix;
+      }
+      if (options.suffix) {
+        data.suffix = options.suffix;
       }
       /* istanbul ignore else */
       if (options.timestamp) {

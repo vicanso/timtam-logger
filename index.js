@@ -6,13 +6,22 @@ const _ = require('lodash');
 const Console = require('./transports/console');
 const UDP = require('./transports/udp');
 
+// { error: 0, warn: 1, info: 2, verbose: 3, debug: 4, silly: 5 }
+const logLevels = {
+  error: 0,
+  warn: 1,
+  info: 2,
+  log: 2,
+  debug: 3,
+};
 const defaultOptions = {
   app: 'timtam',
   timestamp: true,
   // 日志最大长度
   maxLength: 900,
+  level: 3,
 };
-const defaultFns = 'log info warn error'.split(' ');
+const defaultFns = 'log info warn error debug'.split(' ');
 const transports = [];
 
 function log(type, str) {
@@ -24,12 +33,15 @@ function wrap(obj, _fns) {
   _.forEach(fns, (fn) => {
     /* eslint no-param-reassign:0 */
     obj[fn] = function wrapFn() {
+      if (logLevels[fn] > defaultOptions.level) {
+        return;
+      }
       /* eslint prefer-rest-params:0 */
       let args = Array.from(arguments);
       const maxLength = defaultOptions.maxLength;
       if (fn === 'error') {
         args = args.map((argument) => {
-          if (util.isError(argument)) {
+          if (_.isError(argument)) {
             return `Error:${argument.message}, stack:${argument.stack}`;
           }
           return argument;
@@ -41,7 +53,6 @@ function wrap(obj, _fns) {
         str = `${str.substring(0, maxLength)}...`;
       }
       log(fn, str);
-      return str;
     };
   });
 }

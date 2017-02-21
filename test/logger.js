@@ -17,6 +17,20 @@ describe('logger', () => {
     logger.info('Hello World!');
   });
 
+  it('should stringify success', (done) => {
+    const transport = logger.add('console');
+    transport.stdout = {
+      write: (msg) => {
+        assert.equal(msg.indexOf('[info] Hello World! {"name":"tree.xie"}'), 25);
+        logger.remove(transport);
+        done();
+      },
+    };
+    logger.info('Hello World! %j', {
+      name: 'tree.xie',
+    });
+  });
+
   it('should log error success', (done) => {
     const transport = logger.add('console');
     transport.stderr = {
