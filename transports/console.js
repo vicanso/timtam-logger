@@ -40,9 +40,9 @@ class Console extends Transport {
       str = JSON.stringify(data);
     }
     if (level === 'error') {
-      this.stderr.write(str);
+      this.stderr.write(`${str}\n`);
     } else {
-      this.stdout.write(str);
+      this.stdout.write(`${str}\n`);
     }
   }
 }
