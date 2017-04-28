@@ -18,7 +18,7 @@ describe('transport-console', () => {
 
   it('should console log success', (done) => {
     const transport = new Console();
-    const msgList = ['[info] Hello World!', '[error] Hello World!'];
+    const msgList = ['[info] Hello World!\n', '[error] Hello World!\n'];
     const writeObj = {
       write: (msg) => {
         assert.equal(msg, msgList.shift());
@@ -44,7 +44,7 @@ describe('transport-console', () => {
     });
     transport.stdout = {
       write: (msg) => {
-        assert.equal(msg, '{"level":"info","msg":"Hello World!","pid":123}');
+        assert.equal(msg, '{"level":"info","msg":"Hello World!","pid":123}\n');
         done();
       },
     };
