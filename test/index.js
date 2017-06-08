@@ -1,11 +1,10 @@
 'use strict';
 
 const assert = require('assert');
-const Logger = require('../logger');
+const logger = require('..');
 const dgram = require('dgram');
 
 describe('logger', () => {
-  const logger = new Logger();
   it('should log success', (done) => {
     const transport = logger.add('console');
     transport.stdout = {
@@ -17,7 +16,6 @@ describe('logger', () => {
     };
     logger.info('Hello World!');
   });
-
 
   it('should stringify success', (done) => {
     const transport = logger.add('console');
@@ -45,16 +43,18 @@ describe('logger', () => {
     logger.error('Hello World! %s', new Error('fail'));
   });
 
-  it('before and after function success', (done) => {
+  it('prepend and append function success', (done) => {
     const prependFn = () => 'prepend';
     const appendFn = () => 'append';
-    logger.before(prependFn);
-    logger.after(appendFn);
+    logger.addPadding('begin', prependFn);
+    logger.addPadding('end', appendFn);
     const transport = logger.add('console');
     transport.stdout = {
       write: (msg) => {
         assert.equal(msg.indexOf('[info] prepend Hello World! append'), 25);
         logger.remove(transport);
+        logger.removePadding(prependFn);
+        logger.removePadding(appendFn);
         done();
       },
     };

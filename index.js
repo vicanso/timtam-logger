@@ -23,6 +23,7 @@ const defaultOptions = {
 };
 const defaultFns = 'log info warn error debug'.split(' ');
 const transports = [];
+const paddingFunctions = [];
 
 function log(type, str) {
   transports.forEach(transport => transport.log(type, str));
@@ -49,6 +50,23 @@ function wrap(obj, _fns) {
       }
       /* eslint prefer-spread:0 */
       let str = util.format.apply(util, args);
+      const prependList = [];
+      const appendList = [];
+      paddingFunctions.forEach((item) => {
+        const type = item.type;
+        const handle = item.fn;
+        if (type === 'begin') {
+          prependList.push(handle());
+        } else {
+          appendList.push(handle());
+        }
+      });
+      if (prependList.length) {
+        str = `${prependList.join(' ')} ${str}`;
+      }
+      if (appendList.length) {
+        str += ` ${appendList.join(' ')}`;
+      }
       if (str.length > maxLength) {
         str = `${str.substring(0, maxLength)}...`;
       }
@@ -106,9 +124,39 @@ function remove(transport) {
   }
 }
 
+/**
+ * Add padding function
+ *
+ * @param {String} type The padding type, 'begin' or 'end'
+ * @param {Function} fn The padding function, return the string to padding
+ */
+function addPadding(type, fn) {
+  paddingFunctions.push({
+    type,
+    fn,
+  });
+}
+
+/**
+ * Remove padding function
+ * @param {Function} fn The padding function, return the string to padding
+ */
+function removePadding(fn) {
+  let index = -1;
+  paddingFunctions.forEach((item, i) => {
+    if (item.fn === fn) {
+      index = i;
+    }
+  });
+  if (index !== -1) {
+    paddingFunctions.splice(index, 1);
+  }
+}
+
 exports.wrap = wrap;
 exports.add = add;
 exports.remove = remove;
 exports.set = set;
-
+exports.addPadding = addPadding;
+exports.removePadding = removePadding;
 init();

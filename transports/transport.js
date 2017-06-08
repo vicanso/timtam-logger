@@ -1,23 +1,27 @@
 'use strict';
 
 const debug = require('debug')('timtam-logger');
-const _ = require('lodash');
 
 const map = new WeakMap();
 
 class Transport {
   constructor(opts) {
-    const options = _.clone(opts || {});
+    const options = Object.assign({}, opts);
     /* istanbul ignore else */
     if (options.extra && options.format !== 'json') {
-      options.extra = _.map(options.extra, (v, k) => `${k}=${v}`).join();
+      const keys = Object.keys(options.extra);
+      const extra = keys.map((k) => {
+        const v = options.extra[k];
+        return `${k}=${v}`;
+      }).join();
+      options.extra = extra;
     }
 
     debug('options:%j', options);
     map.set(this, options);
   }
   get options() {
-    return _.extend({}, map.get(this));
+    return Object.assign({}, map.get(this));
   }
   /* eslint class-methods-use-this:0 */
   get name() {
@@ -59,7 +63,7 @@ class Transport {
       }
       data = arr.join(' ');
     } else {
-      data = _.extend({
+      data = Object.assign({
         level,
         msg,
       }, options.extra);
