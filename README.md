@@ -13,80 +13,122 @@ $ npm install timtam-logger
 
 ## API
 
-set logger options, default options: {"app": "timtam", "timestamp": true, "maxLength": 900}
+### constructor
+
+- `options` The options for logger, default: {"app": "timtam", "timestamp": true, "maxLength": 900, "level": 3}
 
 ```js
-const logger = require('timtam-logger');
+const Logger = require('timtam-logger');
+const logger = new Logger({
+  app: 'my-app',
+});
+```
 
-logger.set('app', 'timtam-test');
+### set
+
+Set the value for options
+
+- `k` The key of value or data to set
+
+- `v` The value
+
+```js
+const Logger = require('timtam-logger');
+const logger = new Logger({
+  app: 'my-app',
+});
 
 logger.set({
-  app: 'timtam-test'
+  app: 'new-app',
+});
+logger.set('maxLength', 1000);
+```
+
+### add
+
+Add transport for logger
+
+- `type` Transport type or uri for transport
+
+- `opts` The options for transport
+
+```js
+const Logger = require('timtam-logger');
+const logger = new Logger({
+  app: 'my-app',
 });
 
-```
-
-### options
-
-- `app` the application name, default: `timtam'
-
-- `timestamp` add timestamp to the log, default: `true`
-
-- `maxLength` the max length of the log, default: `1000`
-
-wrap an object for logger
-
-```js
-const logger = require('timtam-logger');
-logger.wrap(console, ['info', 'log']);
-
-// console.info === logger.info;
-console.info('Hello World!');
-```
-
-### object
-
-the object which add logger function
-
-
-add udp transport
-
-```js
-const logger = require('timtam-logger');
-// logger.add(transportType, options);
+logger.add('udp://127.0.0.1:5001');
+logger.add('console');
 logger.add('udp', {
-  port: 6000,
-  host: '127.0.0.1'
+  host: '127.0.0.1',
+  port: 4012,
 });
-// or use uri
-logger.add('udp://127.0.0.1:6000');
 ```
 
+### remove
 
-### transportType
+Remove transport from logger
 
-the transport type: `udp`, `console`
-
-### options
-
-- `port` server port. Use in transport `udp` and `console`.
-
-- `host` server host. Use in transport `udp`.
-
-
-remove transport
+- `transport` The transport
 
 ```js
-const logger = require('timtam-logger');
-const udpTransport = logger.add('udp', {
-  port: 6000,
-  host: '127.0.0.1'
+const Logger = require('timtam-logger');
+const logger = new Logger({
+  app: 'my-app',
 });
-setTimeout(function(){
-  logger.remove(udpTransport);
-}, 10 * 1000);
+
+const udpTransport = logger.add('udp://127.0.0.1:5001');
+logger.remove(udpTransport);
+logger.add('console');
 ```
 
+### log info warn error debug
+
+The log function for logger
+
+```js
+const Logger = require('timtam-logger');
+const logger = new Logger({
+  app: 'my-app',
+});
+logger.add('console');
+logger.info('my test');
+```
+
+### wrap
+
+Wrap the function of target to use logger
+
+- `target` The target to wrap 
+- `fns` The function to wrap, default is 'log', 'info', 'warn', 'error', 'debug'
+
+```js
+const Logger = require('timtam-logger');
+const logger = new Logger({
+  app: 'my-app',
+});
+logger.add('console');
+
+logger.wrap(console);
+console.info('my test');
+```
+
+### before after
+
+Use to insertBefore(insertAfter) some content to the log
+
+- `param` The insert message string or function to get the insert message
+
+```js
+const Logger = require('timtam-logger');
+const logger = new Logger({
+  app: 'my-app',
+});
+logger.add('console');
+logger.after('--end');
+logger.after(() => '--start');
+```
 
 
 ## License

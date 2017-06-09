@@ -1,10 +1,11 @@
 'use strict';
 
 const assert = require('assert');
-const logger = require('..');
+const Logger = require('..');
 const dgram = require('dgram');
 
 describe('logger', () => {
+  const logger = new Logger();
   it('should log success', (done) => {
     const transport = logger.add('console');
     transport.stdout = {
@@ -16,6 +17,7 @@ describe('logger', () => {
     };
     logger.info('Hello World!');
   });
+
 
   it('should stringify success', (done) => {
     const transport = logger.add('console');
@@ -43,18 +45,16 @@ describe('logger', () => {
     logger.error('Hello World! %s', new Error('fail'));
   });
 
-  it('prepend and append function success', (done) => {
+  it('before and after function success', (done) => {
     const prependFn = () => 'prepend';
     const appendFn = () => 'append';
-    logger.addPadding('begin', prependFn);
-    logger.addPadding('end', appendFn);
+    logger.before(prependFn);
+    logger.after(appendFn);
     const transport = logger.add('console');
     transport.stdout = {
       write: (msg) => {
         assert.equal(msg.indexOf('[info] prepend Hello World! append'), 25);
         logger.remove(transport);
-        logger.removePadding(prependFn);
-        logger.removePadding(appendFn);
         done();
       },
     };
@@ -120,7 +120,6 @@ describe('logger', () => {
 
     server.on('message', (buf) => {
       const str = buf.toString();
-      console.dir(str);
       assert.equal(str.indexOf('[info] Hello World!'), 36);
       assert(str.indexOf('timtam-app') !== -1);
       logger.remove(transport);

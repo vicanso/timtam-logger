@@ -1,7 +1,6 @@
 'use strict';
 
 const util = require('util');
-const _ = require('lodash');
 
 const Console = require('./transports/console');
 const UDP = require('./transports/udp');
@@ -14,149 +13,260 @@ const logLevels = {
   log: 2,
   debug: 3,
 };
-const defaultOptions = {
-  app: 'timtam',
-  timestamp: true,
-  // 日志最大长度
-  maxLength: 900,
-  level: 3,
-};
-const defaultFns = 'log info warn error debug'.split(' ');
-const transports = [];
-const paddingFunctions = [];
+const optionsSym = Symbol('option');
+const transportsSym = Symbol('transports');
+const beforeSym = Symbol('before');
+const afterSym = Symbol('after');
 
-function log(type, str) {
-  transports.forEach(transport => transport.log(type, str));
+function isFunction(fn) {
+  return Object.prototype.toString.call(fn) === '[object Function]';
 }
 
-function wrap(obj, _fns) {
-  const fns = _fns || defaultFns;
-  _.forEach(fns, (fn) => {
-    /* eslint no-param-reassign:0 */
-    obj[fn] = function wrapFn() {
-      if (logLevels[fn] > defaultOptions.level) {
-        return;
-      }
-      /* eslint prefer-rest-params:0 */
-      let args = Array.from(arguments);
-      const maxLength = defaultOptions.maxLength;
-      if (fn === 'error') {
-        args = args.map((argument) => {
-          if (_.isError(argument)) {
-            return `Error:${argument.message}, stack:${argument.stack}`;
-          }
-          return argument;
-        });
-      }
-      /* eslint prefer-spread:0 */
-      let str = util.format.apply(util, args);
-      const prependList = [];
-      const appendList = [];
-      paddingFunctions.forEach((item) => {
-        const type = item.type;
-        const handle = item.fn;
-        if (type === 'begin') {
-          prependList.push(handle());
-        } else {
-          appendList.push(handle());
-        }
-      });
-      if (prependList.length) {
-        str = `${prependList.join(' ')} ${str}`;
-      }
-      if (appendList.length) {
-        str += ` ${appendList.join(' ')}`;
-      }
-      if (str.length > maxLength) {
-        str = `${str.substring(0, maxLength)}...`;
-      }
-      log(fn, str);
-    };
-  });
-}
-
-function init() {
-  wrap(exports);
-}
-
-function set(k, v) {
-  if (_.isObject(k)) {
-    _.extend(defaultOptions, k);
-  } else {
-    defaultOptions[k] = v;
+class Logger {
+  /**
+   * Creates an instance of Logger.
+   * @param {Object} options The options for logger
+   *
+   * @memberOf Logger
+   */
+  constructor(options) {
+    this[optionsSym] = Object.assign({
+      app: 'timtam',
+      timestamp: true,
+      // 日志最大长度
+      maxLength: 900,
+      level: 3,
+    }, options);
+    this[transportsSym] = [];
+    this[beforeSym] = [];
+    this[afterSym] = [];
   }
-}
-
-/**
- * [add description]
- * @param {[type]} type    [description]
- * @param {[type]} options [description]
- */
-function add(type, options) {
-  options = _.extend({}, options, defaultOptions);
-  const reg = /(\S+?):\/\/(\S+):(\S+)/;
-  const result = reg.exec(type);
-  if (result && result[1] && result[2] && result[3]) {
-    type = result[1];
-    options.host = result[2];
-    options.port = parseInt(result[3], 10);
+  /**
+   * Get the options of logger
+   *
+   * @readonly
+   *
+   * @memberOf Logger
+   */
+  get options() {
+    return Object.assign({}, this[optionsSym]);
   }
-  let transport;
-  if (type === 'udp') {
-    transport = new UDP(options);
-  } else {
-    transport = new Console(options);
-  }
-  transports.push(transport);
-  return transport;
-}
-
-/**
- * [remove description]
- * @param  {[type]} transport [description]
- * @return {[type]}           [description]
- */
-function remove(transport) {
-  const index = transports.indexOf(transport);
-  /* istanbul ignore else */
-  if (index !== -1) {
-    transports.splice(index, 1);
-  }
-}
-
-/**
- * Add padding function
- *
- * @param {String} type The padding type, 'begin' or 'end'
- * @param {Function} fn The padding function, return the string to padding
- */
-function addPadding(type, fn) {
-  paddingFunctions.push({
-    type,
-    fn,
-  });
-}
-
-/**
- * Remove padding function
- * @param {Function} fn The padding function, return the string to padding
- */
-function removePadding(fn) {
-  let index = -1;
-  paddingFunctions.forEach((item, i) => {
-    if (item.fn === fn) {
-      index = i;
+  /**
+   * Set the value to options
+   *
+   * @param {String} k The key of value
+   * @param {any} v The value
+   * @returns {Logger}
+   *
+   * @memberOf Logger
+   */
+  set(k, v) {
+    const options = this[optionsSym];
+    if (k && typeof k === 'object') {
+      Object.assign(options, k);
+    } else {
+      options[k] = v;
     }
-  });
-  if (index !== -1) {
-    paddingFunctions.splice(index, 1);
+    return this;
+  }
+  /**
+   * Add transport for logger
+   *
+   * @param {String} type The transport type or the transport uri
+   * @param {Object} opts The options for transport
+   * @returns {Transport}
+   *
+   * @memberOf Logger
+   */
+  add(type, opts) {
+    const options = Object.assign(this.options, opts);
+    const reg = /(\S+?):\/\/(\S+):(\S+)/;
+    const result = reg.exec(type);
+    let transportType = type;
+    if (result && result[1] && result[2] && result[3]) {
+      transportType = result[1];
+      options.host = result[2];
+      options.port = parseInt(result[3], 10);
+    }
+    let transport;
+    if (transportType === 'udp') {
+      transport = new UDP(options);
+    } else {
+      transport = new Console(options);
+    }
+    this[transportsSym].push(transport);
+    return transport;
+  }
+  /**
+   * Remove the transport from logger
+   *
+   * @param {Transport} transport - The transport
+   * @returns {Logger}
+   *
+   * @memberOf Logger
+   */
+  remove(transport) {
+    const transports = this[transportsSym];
+    const index = transports.indexOf(transport);
+    if (index !== -1) {
+      transports.splice(index, 1);
+    }
+    return this;
+  }
+  rawLog(type, args) {
+    const options = this.options;
+    const beforeList = this[beforeSym];
+    const afterList = this[afterSym];
+    const transports = this[transportsSym];
+    // if the log level is gt options.level, ignore
+    if (logLevels[type] > options.level) {
+      return;
+    }
+    const maxLength = options.maxLength;
+    let argsClone = args.slice(0);
+    if (type === 'error') {
+      argsClone = argsClone.map((argument) => {
+        // convert error to string
+        if (argument.message && argument.stack) {
+          return `Error:${argument.message}, stack:${argument.stack}`;
+        }
+        return argument;
+      });
+    }
+    /* eslint prefer-spread:0 */
+    let str = util.format.apply(util, argsClone);
+
+    const msgList = [];
+    // handle before list
+    beforeList.forEach((item) => {
+      if (isFunction(item)) {
+        msgList.push(item());
+      } else {
+        msgList.push(item);
+      }
+    });
+    if (msgList.length) {
+      str = `${msgList.join(' ')} ${str}`;
+      msgList.length = 0;
+    }
+    // handle after list
+    afterList.forEach((item) => {
+      if (isFunction(item)) {
+        msgList.push(item());
+      } else {
+        msgList.push(item);
+      }
+    });
+    if (msgList.length) {
+      str += ` ${msgList.join(' ')}`;
+    }
+    // cut string
+    if (str.length > maxLength) {
+      str = `${str.substring(0, maxLength)}...`;
+    }
+    transports.forEach(transport => transport.log(type, str));
+  }
+  /**
+   * Log function(like console.log)
+   *
+   * @returns {Logger}
+   *
+   * @memberOf Logger
+   */
+  log() {
+    /* eslint prefer-rest-params:0 */
+    const args = Array.from(arguments);
+    this.rawLog('log', args);
+    return this;
+  }
+  /**
+   * Info function(like console.info)
+   *
+   * @returns {Logger}
+   *
+   * @memberOf Logger
+   */
+  info() {
+    /* eslint prefer-rest-params:0 */
+    const args = Array.from(arguments);
+    this.rawLog('info', args);
+    return this;
+  }
+  /**
+   * Warn function(like console.warn)
+   *
+   * @returns {Logger}
+   *
+   * @memberOf Logger
+   */
+  warn() {
+    /* eslint prefer-rest-params:0 */
+    const args = Array.from(arguments);
+    this.rawLog('warn', args);
+    return this;
+  }
+  /**
+   * Error function(like console.error)
+   *
+   * @returns {Logger}
+   *
+   * @memberOf Logger
+   */
+  error() {
+    /* eslint prefer-rest-params:0 */
+    const args = Array.from(arguments);
+    this.rawLog('error', args);
+    return this;
+  }
+  /**
+   * Debug function(like console.debug)
+   *
+   * @returns {Logger}
+   *
+   * @memberOf Logger
+   */
+  debug() {
+    /* eslint prefer-rest-params:0 */
+    const args = Array.from(arguments);
+    this.rawLog('debug', args);
+    return this;
+  }
+  /**
+   * Wrap the target to use logger
+   *
+   * @param {any} target The target to wrap, such as console
+   * @param {Array} fns The function names
+   *
+   * @memberOf Logger
+   */
+  wrap(target, fns) {
+    const defaultFns = 'log info warn error debug'.split(' ');
+    (fns || defaultFns).forEach((name) => {
+      const fn = this[name].bind(this);
+      /* eslint no-param-reassign:0 */
+      target[name] = fn;
+    });
+  }
+  /**
+   * Add insertAfter handle
+   *
+   * @param {String|Function} param The string(function) to insertAfter
+   *
+   * @memberOf Logger
+   */
+  after(param) {
+    this[afterSym].push(param);
+  }
+  /**
+   * Add insertBefore handle
+   *
+   * @param {String|Function} param The string(function) to insertBefore
+   *
+   * @memberOf Logger
+   */
+  before(param) {
+    this[beforeSym].push(param);
   }
 }
 
-exports.wrap = wrap;
-exports.add = add;
-exports.remove = remove;
-exports.set = set;
-exports.addPadding = addPadding;
-exports.removePadding = removePadding;
-init();
+module.exports = Logger;
