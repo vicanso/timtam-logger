@@ -139,10 +139,12 @@ class Logger {
     const msgList = [];
     // handle before list
     beforeList.forEach((item) => {
+      let msg = item;
       if (isFunction(item)) {
-        msgList.push(item());
-      } else {
-        msgList.push(item);
+        msg = item();
+      }
+      if (msg) {
+        msgList.push(msg);
       }
     });
     if (msgList.length) {
@@ -151,12 +153,15 @@ class Logger {
     }
     // handle after list
     afterList.forEach((item) => {
+      let msg = item;
       if (isFunction(item)) {
-        msgList.push(item());
-      } else {
-        msgList.push(item);
+        msg = item();
+      }
+      if (msg) {
+        msgList.push(msg);
       }
     });
+
     if (msgList.length) {
       str += ` ${msgList.join(' ')}`;
     }
