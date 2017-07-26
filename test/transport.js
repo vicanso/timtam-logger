@@ -1,7 +1,9 @@
 'use strict';
+
 const assert = require('assert');
 const util = require('util');
 const Transport = require('../transports/transport');
+
 describe('transport', () => {
   it('should new Transport success', () => {
     const transport = new Transport();

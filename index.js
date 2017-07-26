@@ -5,14 +5,18 @@ const util = require('util');
 const Console = require('./transports/console');
 const UDP = require('./transports/udp');
 
-// { error: 0, warn: 1, info: 2, verbose: 3, debug: 4, silly: 5 }
+// { emerg: 0, alert: 1, crit: 2, error: 3, warning: 4, notice: 5, info: 6, debug: 7 }
 const logLevels = {
-  error: 0,
-  warn: 1,
-  info: 2,
-  log: 2,
-  debug: 3,
+  emerg: 0,
+  alert: 1,
+  crit: 2,
+  error: 3,
+  warn: 4,
+  notice: 5,
+  info: 6,
+  debug: 7,
 };
+const defaultLevel = 6;
 const optionsSym = Symbol('option');
 const transportsSym = Symbol('transports');
 const beforeSym = Symbol('before');
@@ -35,7 +39,7 @@ class Logger {
       timestamp: true,
       // 日志最大长度
       maxLength: 900,
-      level: 3,
+      level: defaultLevel,
     }, options);
     this[transportsSym] = [];
     this[beforeSym] = [];

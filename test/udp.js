@@ -1,9 +1,9 @@
 'use strict';
+
 const assert = require('assert');
 const util = require('util');
 const UDP = require('../transports/udp');
 const dgram = require('dgram');
-
 
 describe('transport-udp', () => {
   it('should new UDP success', () => {
