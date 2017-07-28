@@ -1,6 +1,7 @@
 'use strict';
 
 const util = require('util');
+const EventEmitter = require('events');
 
 const Console = require('./transports/console');
 const UDP = require('./transports/udp');
@@ -26,7 +27,7 @@ function isFunction(fn) {
   return Object.prototype.toString.call(fn) === '[object Function]';
 }
 
-class Logger {
+class Logger extends EventEmitter {
   /**
    * Creates an instance of Logger.
    * @param {Object} options The options for logger
@@ -34,6 +35,7 @@ class Logger {
    * @memberOf Logger
    */
   constructor(options) {
+    super();
     this[optionsSym] = Object.assign({
       app: 'timtam',
       timestamp: true,
@@ -173,6 +175,9 @@ class Logger {
     if (str.length > maxLength) {
       str = `${str.substring(0, maxLength)}...`;
     }
+    if (this.listenerCount(type)) {
+      this.emit(type, str);
+    }
     transports.forEach(transport => transport.log(type, str));
   }
   /**
@@ -241,6 +246,45 @@ class Logger {
     return this;
   }
   /**
+   * emerg function
+   *
+   * @returns {Logger}
+   *
+   * @memberOf Logger
+   */
+  emerg() {
+    /* eslint prefer-rest-params:0 */
+    const args = Array.from(arguments);
+    this.rawLog('emerg', args);
+    return this;
+  }
+  /**
+   * alert function
+   *
+   * @returns {Logger}
+   *
+   * @memberOf Logger
+   */
+  alert() {
+    /* eslint prefer-rest-params:0 */
+    const args = Array.from(arguments);
+    this.rawLog('alert', args);
+    return this;
+  }
+  /**
+   * crit function
+   *
+   * @returns {Logger}
+   *
+   * @memberOf Logger
+   */
+  crit() {
+    /* eslint prefer-rest-params:0 */
+    const args = Array.from(arguments);
+    this.rawLog('crit', args);
+    return this;
+  }
+  /**
    * Wrap the target to use logger
    *
    * @param {any} target The target to wrap, such as console
@@ -249,7 +293,7 @@ class Logger {
    * @memberOf Logger
    */
   wrap(target, fns) {
-    const defaultFns = 'log info warn error debug'.split(' ');
+    const defaultFns = Object.keys(logLevels);
     (fns || defaultFns).forEach((name) => {
       const fn = this[name].bind(this);
       /* eslint no-param-reassign:0 */

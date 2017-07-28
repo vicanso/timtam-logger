@@ -10,12 +10,13 @@ describe('logger', () => {
     const transport = logger.add('console');
     transport.stdout = {
       write: (msg) => {
-        assert.equal(msg.indexOf('[info] Hello World!'), 25);
+        assert.equal(msg.indexOf('[emerg] Hello World!'), 25);
         logger.remove(transport);
         done();
       },
     };
-    logger.info('Hello World!');
+    logger.emerg('Hello World!');
+    logger.once('emerg', msg => assert.equal(msg, 'Hello World! {"name":"tree.xie"}'));
   });
 
 
