@@ -207,6 +207,19 @@ class Logger extends EventEmitter {
     return this;
   }
   /**
+   * Notice function
+   *
+   * @returns {Logger}
+   *
+   * @memberOf Logger
+   */
+  notice() {
+    /* eslint prefer-rest-params:0 */
+    const args = Array.from(arguments);
+    this.rawLog('notice', args);
+    return this;
+  }
+  /**
    * Warn function(like console.warn)
    *
    * @returns {Logger}
